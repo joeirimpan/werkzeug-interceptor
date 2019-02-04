@@ -8,12 +8,15 @@ import re
 import json
 import argparse
 
+from colorama import init
+from colorama import Fore, Style
 from werkzeug.wrappers import Request, Response
 from werkzeug.exceptions import HTTPException, NotFound, abort
 from werkzeug.routing import Map, Rule
 from werkzeug.serving import run_simple
 
 
+init()
 endpoint_regex = re.compile("[^A-Za-z0-9]+")
 
 class Interceptor(object):
@@ -30,10 +33,16 @@ class Interceptor(object):
             ))
 
             # Add function into the local context
-            exec("""def %s(request):
-                print "Args: ", request.args
-                print "Headers: ", request.headers
-                print "Files: ", request.files
+            code = compile("""def %s(request):
+                print(Fore.GREEN)
+                print("URL\\n----\\n{0}\\n".format(str(request.url)))
+                print("Method\\n----\\n{0}\\n".format(str(request.method)))
+                print("Args\\n----\\n{0}\\n".format(str(request.args)))
+                print("Headers\\n-------\\n{0}\\n".format(str(request.headers)))
+                print("Files\\n-----\\n{0}\\n".format(str(request.files)))
+                print("Form\\n-----\\n{0}\\n".format(str(request.form)))
+                print("Data\\n-----\\n{0}\\n".format(str(request.data)))
+                print(Style.RESET_ALL)
 
                 try:
                     resp = json.loads('%s')
@@ -41,11 +50,17 @@ class Interceptor(object):
                     resp = str('%s')
 
                 return Response(json.dumps(resp))
-            """ % (endpoint_name, rule["response"], rule["response"]))
+            """ % (endpoint_name, rule["response"], rule["response"]), "<string>", "exec")
 
-            meth = locals()[endpoint_name]
+            ns = {
+                "json": json,
+                "Fore": Fore,
+                "Style": Style,
+                "Response": Response,
+            }
+            exec code in ns
 
-            self.__setattr__(endpoint_name, meth)
+            self.__setattr__(endpoint_name, ns[endpoint_name])
 
         self.url_map = Map(rule_objs)
 

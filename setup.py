@@ -29,5 +29,5 @@ setup(
     entry_points={
         'console_scripts': ['http_intercept=interceptor:execute']
     },
-    install_requires=['werkzeug'],
+    install_requires=['werkzeug', 'colorama'],
 )
