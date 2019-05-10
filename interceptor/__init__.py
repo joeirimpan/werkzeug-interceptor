@@ -45,11 +45,11 @@ class Interceptor(object):
                 print(Style.RESET_ALL)
 
                 try:
-                    resp = json.loads('%s')
+                    resp = json.loads(json.dumps('%s'))
                 except ValueError:
                     resp = str('%s')
 
-                return Response(json.dumps(resp))
+                return Response(**{"mimetype": "application/json", "response": resp})
             """ % (endpoint_name, rule["response"], rule["response"]), "<string>", "exec")
 
             ns = {
