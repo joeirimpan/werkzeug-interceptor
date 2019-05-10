@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="http-interceptor",
-    version="0.1.0",
+    version="0.1.2",
     description="Simple HTTP interceptor",
     author="Joe Paul",
     author_email="joeirimpan@gmail.com",
