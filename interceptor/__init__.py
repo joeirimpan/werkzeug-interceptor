@@ -58,7 +58,7 @@ class Interceptor(object):
                 "Style": Style,
                 "Response": Response,
             }
-            exec code in ns
+            exec(code, ns)
 
             self.__setattr__(endpoint_name, ns[endpoint_name])
 
@@ -70,9 +70,9 @@ class Interceptor(object):
         try:
             endpoint, values = adapter.match()
             return getattr(self, endpoint)(request, **values)
-        except NotFound, e:
+        except NotFound as e:
             return abort(404)
-        except HTTPException, e:
+        except HTTPException as e:
             return e
 
     def wsgi_app(self, environ, start_response):
