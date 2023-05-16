@@ -1,8 +1,7 @@
 # werkzeug-interceptor
-How often do you find yourself writing flask apps just to mock that one third party HTTP endpoint? Well, this solves it.
+Werkzeug-Interceptor allows you to mock specific endpoints based on the HTTP method name, endpoint, and response you define.
 
-
-# Usage
+## Usage
 
 ```bash
 http_intercept -p 8000 '[{"methods": ["POST"], "path": "test-endpoint", "response": "Hello"}]'
@@ -11,3 +10,15 @@ http_intercept -p 8000 '[{"methods": ["POST"], "path": "test-endpoint", "respons
 ```bash
 curl -X POST -H "X-Access-Key: some-random-key" http://localhost:8000/test-endpoint
 ```
+
+## Development
+
+Manages the dependencies using [Rye](https://github.com/mitsuhiko/rye)
+```
+cd werkzeug-interceptor
+rye sync
+```
+
+## License
+
+This project is licensed under the MIT License.
