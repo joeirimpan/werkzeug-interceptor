@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     __init__.py
-    :copyright: (c) 2019 by Joe Paul.
+    :copyright: (c) 2023 by Joe Paul.
     :license: see LICENSE for details.
 """
 import re
@@ -19,21 +19,24 @@ from werkzeug.serving import run_simple
 init()
 endpoint_regex = re.compile("[^A-Za-z0-9]+")
 
-class Interceptor(object):
 
+class Interceptor(object):
     def __init__(self, rules):
         rule_objs = []
         for rule in rules:
-            endpoint_name = endpoint_regex.sub('', rule["path"])
+            endpoint_name = endpoint_regex.sub("", rule["path"])
 
-            rule_objs.append(Rule(
-                '/%s' % rule["path"],
-                methods=rule["methods"],
-                endpoint=endpoint_name
-            ))
+            rule_objs.append(
+                Rule(
+                    "/%s" % rule["path"],
+                    methods=rule["methods"],
+                    endpoint=endpoint_name,
+                )
+            )
 
             # Add function into the local context
-            code = compile("""def %s(request):
+            code = compile(
+                """def %s(request):
                 print(Fore.GREEN)
                 print("URL\\n----\\n{0}\\n".format(str(request.url)))
                 print("Method\\n----\\n{0}\\n".format(str(request.method)))
@@ -50,7 +53,11 @@ class Interceptor(object):
                     resp = str('%s')
 
                 return Response(**{"mimetype": "application/json", "response": resp})
-            """ % (endpoint_name, rule["response"], rule["response"]), "<string>", "exec")
+            """
+                % (endpoint_name, rule["response"], rule["response"]),
+                "<string>",
+                "exec",
+            )
 
             ns = {
                 "json": json,
@@ -86,26 +93,25 @@ class Interceptor(object):
 
 
 class HTTPInterceptorCLI(argparse.ArgumentParser):
-    info = ({
-        'prog': 'HTTP interceptors',
-        'description': 'Simple HTTP interceptor',
-    })
+    info = {
+        "prog": "HTTP interceptors",
+        "description": "Simple HTTP interceptor",
+    }
 
     def __init__(self):
         super(HTTPInterceptorCLI, self).__init__(**self.info)
 
         self.add_argument(
-            'rules', type=json.loads, help='List of dicts representing url rules'
+            "rules", type=json.loads, help="List of dicts representing url rules"
         )
         self.add_argument(
-            '-p', '--port', type=int,
-            default=8080, dest='port', help='HTTP port'
+            "-p", "--port", type=int, default=8080, dest="port", help="HTTP port"
         )
 
     def run(self, args=None):
         """Runs the interceptor with the specified rules"""
         app = Interceptor(args.rules)
-        run_simple('localhost', args.port, app)
+        run_simple("localhost", args.port, app)
 
 
 def execute():
